@@ -156,9 +156,9 @@ namespace Tickets.Controllers
 
             var recipients = new List<string>
             {
-                "jose.lugo@mesa.ms",
-                "angel.medina@mesa.ms",
-                "gerente@empresa.com"
+                "juan.poblano@mesa.ms",
+                "alberto.garcia@mesa.ms",
+                "ulises.gonzalez@mesa.ms"
             };
 
             await _emailService.SendEmailAsync(recipients, subject, body);
