@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Tickets.Dtos;
 using Tickets.Models;
+using Tickets.Services;
 
 namespace Tickets.Controllers
 {
@@ -11,10 +12,12 @@ namespace Tickets.Controllers
     public class TicketFormController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly EmailService _emailService;
 
-        public TicketFormController(AppDbContext context)
+        public TicketFormController(AppDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -73,6 +76,16 @@ namespace Tickets.Controllers
             _context.Tickets.Add(newTicket);
 
             await _context.SaveChangesAsync();
+
+            try
+            {
+                await SendEmailTickets(newTicket);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error enviando correo: {ex.Message}");
+            }
+
             return Ok(new
             {
                 success = true,
@@ -113,13 +126,41 @@ namespace Tickets.Controllers
             if(ticket == null) return NotFound("Ticket not found");
 
             _context.Tickets.Remove(ticket);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();            
 
             return Ok(new 
             {
                 success = true,
                 message = "Ticket deleted successfully"           
             });
+        }
+
+        private async Task SendEmailTickets(Ticket ticket)
+        {
+            var subject = "Nuevo ticket registrado";
+
+            var body = $@"
+                <h3>¡Hola!</h3>
+                <p>Se ha registrado un nuevo ticket que requiere tu atención.</p>
+                <ul>
+                    <li><strong>Nombre:</strong> {ticket.Name}</li>
+                    <li><strong>Departamento:</strong> {ticket.Department ?? "N/A"}</li>
+                    <li><strong>Asunto:</strong> {ticket.Affair}</li>
+                    <li><strong>Categoría:</strong> {ticket.Category?.Name ?? "Sin categoría"}</li>
+                </ul>
+                <p><em>Por favor, revísalo a la brevedad.</em></p>
+                <br/>
+                <p>Saludos,<br/>Equipo de Soporte</p>
+            ";
+
+            var recipients = new List<string>
+            {
+                "jose.lugo@mesa.ms",
+                "angel.medina@mesa.ms",
+                "gerente@empresa.com"
+            };
+
+            await _emailService.SendEmailAsync(recipients, subject, body);
         }
     }
 }
