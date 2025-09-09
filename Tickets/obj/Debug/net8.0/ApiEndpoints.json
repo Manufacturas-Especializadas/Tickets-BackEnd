@@ -1,0 +1,75 @@
+[
+  {
+    "ContainingType": "Tickets.Controllers.TicketFormController",
+    "Method": "Delete",
+    "RelativePath": "api/TicketForm/Delete/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Tickets.Controllers.TicketFormController",
+    "Method": "GetCategories",
+    "RelativePath": "api/TicketForm/GetCategories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Tickets.Controllers.TicketFormController",
+    "Method": "GetTickets",
+    "RelativePath": "api/TicketForm/GetTickets",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Tickets.Controllers.TicketFormController",
+    "Method": "RegisterTicket",
+    "RelativePath": "api/TicketForm/RegisterTicket",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ticket",
+        "Type": "Tickets.Dtos.TicketDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Tickets.Controllers.TicketFormController",
+    "Method": "Update",
+    "RelativePath": "api/TicketForm/Update/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ticketDTO",
+        "Type": "Tickets.Dtos.TicketDTO",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
