@@ -36,6 +36,7 @@ namespace Tickets.Controllers
         public async Task<IActionResult> GetTickets()
         {
             var tickets = await _context.Tickets
+                                .OrderByDescending(t => t.Id)
                                 .Select(t => new
                                 {
                                     t.Id,
