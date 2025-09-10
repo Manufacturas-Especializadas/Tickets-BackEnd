@@ -52,4 +52,4 @@ jobs:
           app-name: 'app-mesa-tickets-api-prod'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_054AFE07E4C540B886DFEB6DFDFFB9C6 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7E668081C27241658325B4A4EE81052F }}
