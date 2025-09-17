@@ -55,6 +55,36 @@ namespace Tickets.Controllers
             return Ok(tickets);
         }
 
+        [HttpGet]
+        [Route("SearchTicketByName")]
+        public async Task<IActionResult> SearchTicketByName([FromQuery] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return BadRequest("El parámetro 'name' es obligatorio.");
+
+            var ticket = await _context.Tickets
+                .Where(t => EF.Functions.Like(t.Name, $"%{name}%"))
+                .OrderByDescending(t => t.Id)
+                .Select(t => new
+                {
+                    t.Id,
+                    t.Name,
+                    t.Department,
+                    t.Affair,
+                    t.ProblemDescription,
+                    t.CategoryId,
+                    t.StatusId,
+                    RegistrationDate = t.RegistrationDate!.Value.ToString("yyyy-MM-ddTHH:mm:ss")
+                })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (ticket == null)
+                return NotFound(new { success = false, message = "No se encontró ningún ticket con ese nombre." });
+
+            return Ok(new { success = true, data = ticket });
+        }
+
         [HttpPost]
         [Route("RegisterTicket")]
         public async Task<IActionResult> RegisterTicket([FromBody] TicketDTO ticket)
