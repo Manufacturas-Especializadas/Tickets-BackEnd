@@ -187,7 +187,6 @@ namespace Tickets.Controllers
             var recipients = new List<string>
             {
                 "juan.poblano@mesa.ms",
-                "alberto.garcia@mesa.ms",
                 "ulises.gonzalez@mesa.ms"
             };
 
