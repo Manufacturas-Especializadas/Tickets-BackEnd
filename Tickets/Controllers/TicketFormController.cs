@@ -101,7 +101,8 @@ namespace Tickets.Controllers
                 Affair = ticket.Affair,
                 ProblemDescription = ticket.ProblemDescription,
                 CategoryId = ticket.CategoryId,
-                StatusId = 1
+                StatusId = 1,
+                ResolutionDate = null
             };
 
             _context.Tickets.Add(newTicket);
@@ -131,6 +132,15 @@ namespace Tickets.Controllers
         {
             var ticket = await _context.Tickets.FindAsync(id);
             if (ticket == null) return BadRequest("Ticket not found");
+
+            if (ticketDTO.StatusId == 3 && ticket.StatusId != 3)
+            {
+                ticket.ResolutionDate = DateTime.UtcNow;
+            }
+            else if (ticketDTO.StatusId != 3 && ticket.StatusId == 3)
+            {
+                ticket.ResolutionDate = null;
+            }
 
             ticket.Name = ticketDTO.Name;
             ticket.Department = ticketDTO.Department;
@@ -186,8 +196,8 @@ namespace Tickets.Controllers
 
             var recipients = new List<string>
             {
-                "juan.poblano@mesa.ms",
-                "ulises.gonzalez@mesa.ms"
+                "",
+                ""
             };
 
             await _emailService.SendEmailAsync(recipients, subject, body);

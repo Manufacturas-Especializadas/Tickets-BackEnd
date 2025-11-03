@@ -21,6 +21,8 @@ public partial class Ticket
 
     public DateTime? RegistrationDate { get; set; }
 
+    public DateTime? ResolutionDate { get; set; }
+
     public virtual TkCategory Category { get; set; }
 
     public virtual TkStatus Status { get; set; }

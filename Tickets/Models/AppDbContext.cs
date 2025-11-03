@@ -44,6 +44,9 @@ public partial class AppDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("registrationDate");
+            entity.Property(e => e.ResolutionDate)
+                .HasColumnType("datetime")
+                .HasColumnName("resolutionDate");
             entity.Property(e => e.StatusId).HasColumnName("statusId");
 
             entity.HasOne(d => d.Category).WithMany(p => p.Tickets)
@@ -80,6 +83,7 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("name");
         });
+        modelBuilder.HasSequence("Seq_Folio");
 
         OnModelCreatingPartial(modelBuilder);
     }

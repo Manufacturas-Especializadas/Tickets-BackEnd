@@ -13,5 +13,7 @@
         public string Affair { get; set; }
 
         public string ProblemDescription { get; set; }
+
+        public DateTime? ResolutionDate { get; set; }
     }
 }
