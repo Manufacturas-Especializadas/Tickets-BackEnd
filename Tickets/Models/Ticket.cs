@@ -13,11 +13,11 @@ public partial class Ticket
 
     public string Name { get; set; }
 
-    public string Department { get; set; }
+    public string? Department { get; set; }
 
-    public string Affair { get; set; }
+    public string? Affair { get; set; }
 
-    public string ProblemDescription { get; set; }
+    public string? ProblemDescription { get; set; }
 
     public DateTime? RegistrationDate { get; set; }
 

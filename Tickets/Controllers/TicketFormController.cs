@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Tickets.Dtos;
@@ -83,6 +84,91 @@ namespace Tickets.Controllers
                 return NotFound(new { success = false, message = "No se encontró ningún ticket con ese nombre." });
 
             return Ok(new { success = true, data = ticket });
+        }
+
+        [HttpPost]
+        [Route("DownloadReport")]
+        public async Task<IActionResult> DownloadReport()
+        {
+            var tickts = await _context.Tickets.Select(t => new
+            {
+                t.Id,
+                t.Name,
+                Category = t.Category.Name,
+                Status = t.Status.Name, // Asegúrate de que esto trae "Pendiente", "Resuelto", etc.
+                t.RegistrationDate,
+                t.ResolutionDate,
+            })
+            .AsNoTracking()
+            .ToListAsync();
+
+            using (var workBook = new XLWorkbook())
+            {
+                var workSheet = workBook.Worksheets.Add("Tickets");
+
+                // --- 1. ESTILO DEL ENCABEZADO ---
+                // Primero, establece los valores
+                workSheet.Cell(1, 1).Value = "ID";
+                workSheet.Cell(1, 2).Value = "Nombre del solicitante";
+                workSheet.Cell(1, 3).Value = "Tipo de ticket";
+                workSheet.Cell(1, 4).Value = "Estatus del ticket";
+                workSheet.Cell(1, 5).Value = "Fecha de la solicitud";
+                workSheet.Cell(1, 6).Value = "Fecha de resolución";
+
+                var headerRange = workSheet.Range("A1:F1");
+                headerRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#0071ab");
+                headerRange.Style.Font.FontColor = XLColor.White;
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                for (int i = 0; i < tickts.Count; i++)
+                {
+                    var rowNumber = i + 2;
+                    var currentRow = workSheet.Row(rowNumber);
+
+                    workSheet.Cell(rowNumber, 1).Value = tickts[i].Id;
+                    workSheet.Cell(rowNumber, 2).Value = tickts[i].Name;
+                    workSheet.Cell(rowNumber, 3).Value = tickts[i].Category;
+                    workSheet.Cell(rowNumber, 4).Value = tickts[i].Status;
+
+                    workSheet.Cell(rowNumber, 5).Value = tickts[i].RegistrationDate.HasValue
+                        ? tickts[i].RegistrationDate.Value.ToString("dd/MM/yyyy")
+                        : "N/A";
+
+                    workSheet.Cell(rowNumber, 6).Value = tickts[i].ResolutionDate.HasValue
+                        ? tickts[i].ResolutionDate.Value.ToString("dd/MM/yyyy")
+                        : "Sin resolver";
+
+                    if (rowNumber % 2 == 0)
+                    {
+                        currentRow.Style.Fill.BackgroundColor = XLColor.FromHtml("#F4F4F4");
+                    }
+                }
+ 
+                var statusColumn = workSheet.Range($"D2:D{tickts.Count + 1}");
+
+                statusColumn.AddConditionalFormat().WhenContains("Resuelto")
+                    .Fill.SetBackgroundColor(XLColor.FromHtml("#C6EFCE"))
+                    .Font.SetFontColor(XLColor.FromHtml("#006100"));
+
+                statusColumn.AddConditionalFormat().WhenContains("En progreso")
+                    .Fill.SetBackgroundColor(XLColor.FromHtml("#BDD7EE"))
+                    .Font.SetFontColor(XLColor.FromHtml("#1A4E8A"));
+
+                statusColumn.AddConditionalFormat().WhenContains("Pendiente")
+                    .Fill.SetBackgroundColor(XLColor.FromHtml("#FFEB9C"))
+                    .Font.SetFontColor(XLColor.FromHtml("#9C6500")); 
+
+                workSheet.Columns().AdjustToContents();
+
+                var stream = new MemoryStream();
+                workBook.SaveAs(stream);
+                stream.Position = 0;
+
+                var fileName = $"ReporteDeTickets_{DateTime.Now:ddMMyyyy}.xlsx";
+
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
         }
 
         [HttpPost]
@@ -196,8 +282,8 @@ namespace Tickets.Controllers
 
             var recipients = new List<string>
             {
-                "",
-                ""
+                "juan.poblano@mesa.ms",
+                "ulises.gonzalez@mesa.ms"
             };
 
             await _emailService.SendEmailAsync(recipients, subject, body);
