@@ -95,7 +95,7 @@ namespace Tickets.Controllers
                 t.Id,
                 t.Name,
                 Category = t.Category.Name,
-                Status = t.Status.Name, // Asegúrate de que esto trae "Pendiente", "Resuelto", etc.
+                Status = t.Status.Name,
                 t.RegistrationDate,
                 t.ResolutionDate,
             })
@@ -106,8 +106,6 @@ namespace Tickets.Controllers
             {
                 var workSheet = workBook.Worksheets.Add("Tickets");
 
-                // --- 1. ESTILO DEL ENCABEZADO ---
-                // Primero, establece los valores
                 workSheet.Cell(1, 1).Value = "ID";
                 workSheet.Cell(1, 2).Value = "Nombre del solicitante";
                 workSheet.Cell(1, 3).Value = "Tipo de ticket";
