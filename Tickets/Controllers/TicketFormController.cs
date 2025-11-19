@@ -137,7 +137,7 @@ namespace Tickets.Controllers
 
                     workSheet.Cell(rowNumber, 6).Value = tickts[i].ResolutionDate.HasValue
                         ? tickts[i].ResolutionDate.Value.ToString("dd/MM/yyyy")
-                        : "Sin resolver";
+                        : " ";
 
                     if (rowNumber % 2 == 0)
                     {
