@@ -16,6 +16,10 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[Roles]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Tickets]",
          "ObjectType": 0
       },
@@ -25,6 +29,10 @@
       },
       {
          "Name": "[dbo].[TkStatus]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Users]",
          "ObjectType": 0
       }
    ],

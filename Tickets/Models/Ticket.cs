@@ -23,7 +23,11 @@ public partial class Ticket
 
     public DateTime? ResolutionDate { get; set; }
 
+    public int? UserId { get; set; }
+
     public virtual TkCategory Category { get; set; }
 
     public virtual TkStatus Status { get; set; }
+
+    public virtual User User { get; set; }
 }
