@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -229,6 +230,7 @@ namespace Tickets.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("Update/{id:int}")]
         public async Task<IActionResult> Update([FromBody] TicketDTO ticketDTO, int id)
         {
