@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using Tickets.Dtos;
 using Tickets.Models;
 using Tickets.Services;
@@ -98,6 +99,7 @@ namespace Tickets.Controllers
                 Status = t.Status.Name,
                 t.RegistrationDate,
                 t.ResolutionDate,
+                ResolvedBy = t.User != null ? t.User.Name : "Sin asignar"
             })
             .AsNoTracking()
             .ToListAsync();
@@ -112,8 +114,9 @@ namespace Tickets.Controllers
                 workSheet.Cell(1, 4).Value = "Estatus del ticket";
                 workSheet.Cell(1, 5).Value = "Fecha de la solicitud";
                 workSheet.Cell(1, 6).Value = "Fecha de resolución";
+                workSheet.Cell(1, 7).Value = "Resuelto por";
 
-                var headerRange = workSheet.Range("A1:F1");
+                var headerRange = workSheet.Range("A1:G1");
                 headerRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#0071ab");
                 headerRange.Style.Font.FontColor = XLColor.White;
                 headerRange.Style.Font.Bold = true;
@@ -130,12 +133,14 @@ namespace Tickets.Controllers
                     workSheet.Cell(rowNumber, 4).Value = tickts[i].Status;
 
                     workSheet.Cell(rowNumber, 5).Value = tickts[i].RegistrationDate.HasValue
-                        ? tickts[i].RegistrationDate.Value.ToString("dd/MM/yyyy")
+                        ? tickts[i].RegistrationDate!.Value.ToString("dd/MM/yyyy")
                         : "N/A";
 
                     workSheet.Cell(rowNumber, 6).Value = tickts[i].ResolutionDate.HasValue
-                        ? tickts[i].ResolutionDate.Value.ToString("dd/MM/yyyy")
+                        ? tickts[i].ResolutionDate!.Value.ToString("dd/MM/yyyy")
                         : " ";
+
+                    workSheet.Cell(rowNumber, 7).Value = tickts[i].ResolvedBy;
 
                     if (rowNumber % 2 == 0)
                     {
@@ -220,10 +225,17 @@ namespace Tickets.Controllers
             if (ticketDTO.StatusId == 3 && ticket.StatusId != 3)
             {
                 ticket.ResolutionDate = DateTime.UtcNow;
+
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if(userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+                {
+                    ticket.UserId = userId;
+                }
             }
             else if (ticketDTO.StatusId != 3 && ticket.StatusId == 3)
             {
                 ticket.ResolutionDate = null;
+                ticket.UserId = null;
             }
 
             ticket.Name = ticketDTO.Name;
