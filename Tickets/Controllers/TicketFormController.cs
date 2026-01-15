@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -114,9 +115,10 @@ namespace Tickets.Controllers
                 workSheet.Cell(1, 4).Value = "Estatus del ticket";
                 workSheet.Cell(1, 5).Value = "Fecha de la solicitud";
                 workSheet.Cell(1, 6).Value = "Fecha de resolución";
-                workSheet.Cell(1, 7).Value = "Resuelto por";
+                workSheet.Cell(1, 7).Value = "Días trancurridos";
+                workSheet.Cell(1, 8).Value = "Resuelto por";
 
-                var headerRange = workSheet.Range("A1:G1");
+                var headerRange = workSheet.Range("A1:H1");
                 headerRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#0071ab");
                 headerRange.Style.Font.FontColor = XLColor.White;
                 headerRange.Style.Font.Bold = true;
@@ -140,7 +142,19 @@ namespace Tickets.Controllers
                         ? tickts[i].ResolutionDate!.Value.ToString("dd/MM/yyyy")
                         : " ";
 
-                    workSheet.Cell(rowNumber, 7).Value = tickts[i].ResolvedBy;
+                    if (tickts[i].RegistrationDate.HasValue && tickts[i].RegistrationDate.HasValue)
+                    {
+                        TimeSpan difference = tickts[i].RegistrationDate!.Value - tickts[i].RegistrationDate!.Value;
+
+                        workSheet.Cell(rowNumber, 7).Value = difference.Days;
+                        workSheet.Cell(rowNumber, 7).Style.NumberFormat.Format = "0.0";
+                    }
+                    else
+                    {
+                        workSheet.Cell(rowNumber, 8).Value = "-";
+                    }
+
+                    workSheet.Cell(rowNumber, 8).Value = tickts[i].ResolvedBy;
 
                     if (rowNumber % 2 == 0)
                     {
@@ -216,6 +230,7 @@ namespace Tickets.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("Update/{id:int}")]
         public async Task<IActionResult> Update([FromBody] TicketDTO ticketDTO, int id)
         {
@@ -292,8 +307,8 @@ namespace Tickets.Controllers
 
             var recipients = new List<string>
             {
-                "juan.poblano@mesa.ms",
-                "ulises.gonzalez@mesa.ms"
+                "ulises.gonzalez@mesa.ms",
+                "juan.poblano@mesa.ms"
             };
 
             await _emailService.SendEmailAsync(recipients, subject, body);
